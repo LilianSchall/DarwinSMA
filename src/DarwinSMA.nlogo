@@ -7,8 +7,14 @@ creatures-own
   sense
 ]
 
+patches-own
+[
+  food?
+]
+
 to init
    __clear-all-and-reset-ticks
+  init-patches
   create-creatures nb-creatures
   [
     set shape "person"
@@ -22,6 +28,13 @@ to init
     set speed 1
     set size 1
     set sense 1
+  ]
+end
+
+to init-patches
+  ask n-of nb-food patches with [count neighbors = 8] [
+    set pcolor green
+    set food? true
   ]
 end
 
