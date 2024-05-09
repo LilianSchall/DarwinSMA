@@ -8,11 +8,6 @@ creatures-own
   energy
 ]
 
-patches-own
-[
-  food?
-]
-
 to init
    __clear-all-and-reset-ticks
   init-patches
@@ -22,7 +17,6 @@ end
 to init-patches
   ask n-of nb-food patches with [count neighbors = 8] [
     set pcolor green
-    set food? true
   ]
 end
 
@@ -51,15 +45,30 @@ to go
 end
 
 to move-creatures
-  ask creatures with [energy > 0] ; only move creatures
+  ask creatures with [energy > 0] ; only give life to creatures
   [                               ; who still got energy left
+    if pcolor = green [eat-grass]
     move-primitive
     set energy (energy - (speed * speed * size * size * size + sense))
+
   ]
 end
 
 to move-primitive
-  fd 1
+  if any? patches with [pcolor = green] in-radius sense
+  [
+    face min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]
+  ]
+  fd speed
+end
+
+to eat-grass
+  set pcolor black
+  face min-one-of (patches with ; go to the nearest edge
+    [
+      count neighbors < 8 and
+      not any? turtles-here
+    ]) [distance myself]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
