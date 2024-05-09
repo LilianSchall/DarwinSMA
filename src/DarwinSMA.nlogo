@@ -5,6 +5,7 @@ creatures-own
   speed
   size
   sense
+  energy
 ]
 
 patches-own
@@ -15,20 +16,7 @@ patches-own
 to init
    __clear-all-and-reset-ticks
   init-patches
-  create-creatures nb-creatures
-  [
-    set shape "person"
-    set color green
-    move-to one-of patches with ; simply said:
-    [
-      count neighbors < 8 and   ; place the creatures at the edge of the world
-      not any? turtles-here     ; where no creature has been place yet
-    ]
-
-    set speed 1
-    set size 1
-    set sense 1
-  ]
+  init-creatures
 end
 
 to init-patches
@@ -38,8 +26,40 @@ to init-patches
   ]
 end
 
+to init-creatures
+  create-creatures nb-creatures
+  [
+    set shape "person"
+    set color green
+    move-to one-of patches with ; simply said:
+    [
+      count neighbors < 8 and   ; place the creatures at the edge of the world
+      not any? turtles-here     ; where no creature has been place yet
+    ]
+    face patch 0 0 ; face towards the center
+
+    set speed 1
+    set size 1
+    set sense 1
+    set energy 100
+  ]
+end
+
 to go
+  move-creatures
   tick
+end
+
+to move-creatures
+  ask creatures with [energy > 0] ; only move creatures
+  [                               ; who still got energy left
+    move-primitive
+    set energy (energy - (speed * speed * size * size * size + sense))
+  ]
+end
+
+to move-primitive
+  fd 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
