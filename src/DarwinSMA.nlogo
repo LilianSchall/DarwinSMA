@@ -1,5 +1,28 @@
+breed [creatures creature]
+
+creatures-own
+[
+  speed
+  size
+  sense
+]
+
 to init
    __clear-all-and-reset-ticks
+  create-creatures nb-creatures
+  [
+    set shape "person"
+    set color green
+    move-to one-of patches with ; simply said:
+    [
+      count neighbors < 8 and   ; place the creatures at the edge of the world
+      not any? turtles-here     ; where no creature has been place yet
+    ]
+
+    set speed 1
+    set size 1
+    set sense 1
+  ]
 end
 
 to go
@@ -20,8 +43,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 -40
 40
@@ -66,6 +89,36 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+40
+248
+212
+281
+nb-creatures
+nb-creatures
+1
+50
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+41
+301
+213
+334
+nb-food
+nb-food
+1
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
