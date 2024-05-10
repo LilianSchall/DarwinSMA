@@ -6,12 +6,13 @@ creatures-own
   size
   sense
   energy
+  nb-food-taken
 ]
 
 to init
    __clear-all-and-reset-ticks
   init-patches
-  init-creatures
+  init-creatures nb-creatures
 end
 
 to init-patches
@@ -20,8 +21,8 @@ to init-patches
   ]
 end
 
-to init-creatures
-  create-creatures nb-creatures
+to init-creatures [nb]
+  create-creatures nb
   [
     set shape "person"
     set color green
@@ -34,13 +35,18 @@ to init-creatures
 
     set speed 1
     set size 1
-    set sense 1
-    set energy 100
+    set sense nb-init-sense
+
+    set energy nb-init-energy
+    set nb-food-taken 0
   ]
 end
 
 to go
   move-creatures
+  if (count creatures with [energy > 0]) = 0 [
+    next-generation
+  ]
   tick
 end
 
@@ -64,12 +70,38 @@ end
 
 to eat-grass
   set pcolor black
+  set nb-food-taken (nb-food-taken + 1)
   face min-one-of (patches with ; go to the nearest edge
     [
       count neighbors < 8 and
       not any? turtles-here
     ]) [distance myself]
 end
+
+
+to next-generation
+  clear-patches
+  clear-creatures-not-at-home
+  reproduce-creatures
+  init-patches
+end
+
+to clear-creatures-not-at-home
+  ask creatures with [count neighbors >= 8 or nb-food-taken = 0] [
+    die
+  ]
+end
+
+to reproduce-creatures
+  let nb-offsprings (count creatures with [nb-food-taken >= 2])
+  init-creatures nb-offsprings
+  ask creatures [
+    set energy nb-init-energy
+    set nb-food-taken 0
+    face patch 0 0 ; face towards the center
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 268
@@ -161,6 +193,54 @@ nb-food
 1
 NIL
 HORIZONTAL
+
+SLIDER
+39
+475
+211
+508
+nb-init-energy
+nb-init-energy
+10
+500
+250.0
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+39
+512
+211
+545
+nb-init-sense
+nb-init-sense
+1
+10
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+30
+602
+230
+752
+nb-creatures
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count creatures"
 
 @#$#@#$#@
 ## WHAT IS IT?
