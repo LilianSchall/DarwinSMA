@@ -2,9 +2,13 @@ breed [creatures creature]
 
 creatures-own
 [
+  ; creatures are characterized by their
+  ; speed, size and size.
   speed
   size
   sense
+
+  ; those properties are used for ongoing generation
   energy
   nb-food-taken
 ]
@@ -16,12 +20,15 @@ to init
 end
 
 to init-patches
+  ; generate food randomly in the world
   ask n-of nb-food patches with [count neighbors = 8] [
     set pcolor green
   ]
 end
 
 to init-creatures [nb]
+  ; create creatures at the edge of the world
+  ; facing towards the center
   create-creatures nb
   [
     set shape "person"
@@ -43,7 +50,11 @@ to init-creatures [nb]
 end
 
 to go
+  ; for each tick, we move the creature, eat if necessary
   move-creatures
+
+  ; whenever no creature can move, it's the end of the generation
+  ; so let's launch the next generation
   if (count creatures with [energy > 0]) = 0 [
     next-generation
   ]
@@ -53,16 +64,17 @@ end
 to move-creatures
   ask creatures with [energy > 0] ; only give life to creatures
   [                               ; who still got energy left
-    if pcolor = green [eat-grass]
+    if pcolor = green and nb-food-taken < 2 [eat-grass] ; if we are on food, eat it
     move-primitive
     set energy (energy - (speed * speed * size * size * size + sense))
-
   ]
 end
 
 to move-primitive
+  ; if we're near some food, go towards it
   if any? patches with [pcolor = green] in-radius sense
   [
+    ; we select the nearest food and go towards it
     face min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]
   ]
   fd speed
@@ -87,6 +99,7 @@ to next-generation
 end
 
 to clear-creatures-not-at-home
+  ; creatures that are not at the edge of the world or that haven't eaten must die
   ask creatures with [count neighbors >= 8 or nb-food-taken = 0] [
     die
   ]
