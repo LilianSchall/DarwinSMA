@@ -5,7 +5,7 @@ creatures-own
   ; creatures are characterized by their
   ; speed, size and size.
   speed
-  size
+  creature-size
   sense
 
   ; those properties are used for ongoing generation
@@ -41,7 +41,8 @@ to init-creatures [nb]
     face patch 0 0 ; face towards the center
 
     set speed 1
-    set size 1
+    set creature-size 1
+    set size creature-size
     set sense nb-init-sense
 
     set energy nb-init-energy
@@ -72,7 +73,7 @@ end
 
 to move-primitive
   ; if we're near some food, go towards it
-  if any? patches with [pcolor = green] in-radius sense
+  if nb-food-taken < 2 and any? patches with [pcolor = green] in-radius sense
   [
     ; we select the nearest food and go towards it
     face min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]
@@ -186,7 +187,7 @@ nb-creatures
 nb-creatures
 1
 50
-50.0
+5.0
 1
 1
 NIL
@@ -201,7 +202,7 @@ nb-food
 nb-food
 1
 100
-50.0
+100.0
 1
 1
 NIL
@@ -216,7 +217,7 @@ nb-init-energy
 nb-init-energy
 10
 500
-250.0
+500.0
 10
 1
 NIL
