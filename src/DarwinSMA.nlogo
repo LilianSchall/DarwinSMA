@@ -116,6 +116,28 @@ to reproduce-creatures
   ]
 end
 
+to reproduce-creatures-with-mutation
+  ask creatures with [nb-food-taken >= 2] [
+    let mutate-speed-up (mutation 0.5)
+    let mutate-speed-down (mutation -0.5)
+    let mutate-size-up (mutation 0.5)
+    let mutate-size-down (mutation -0.5)
+    let mutate-sense-up (mutation 1)
+    let mutate-sense-down (mutation -1)
+
+    hatch 1 [
+      set creature-size (creature-size + mutate-size-up + mutate-size-down)
+      set speed (speed + mutate-speed-up + mutate-speed-down)
+      set sense (sense + mutate-sense-up + mutate-sense-down)
+    ]
+  ]
+end
+
+to-report mutation [value]
+  ifelse (random 100) < proba-mutation * 100
+  [ report value ]
+  [ report 0 ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 268
@@ -187,7 +209,7 @@ nb-creatures
 nb-creatures
 1
 50
-5.0
+50.0
 1
 1
 NIL
@@ -255,6 +277,21 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count creatures"
+
+SLIDER
+76
+422
+248
+455
+proba-mutation
+proba-mutation
+0.1
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
