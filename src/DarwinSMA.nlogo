@@ -73,12 +73,15 @@ end
 
 to move-primitive
   ; if we're near some food, go towards it
-  if nb-food-taken < 2 and any? patches with [pcolor = green] in-radius sense
+  ifelse nb-food-taken < 2 and any? patches with [pcolor = green] in-radius sense
   [
     ; we select the nearest food and go towards it
     face min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]
+    let d (distance (min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]))
+    fd min list d speed
   ]
-  fd speed
+  [ fd speed]
+
 end
 
 to eat-grass
@@ -95,7 +98,8 @@ end
 to next-generation
   clear-patches
   clear-creatures-not-at-home
-  reproduce-creatures
+  reproduce-creatures-with-mutation
+  reset-creatures
   init-patches
 end
 
@@ -106,7 +110,7 @@ to clear-creatures-not-at-home
   ]
 end
 
-to reproduce-creatures
+to reproduce-creatures ; unused
   let nb-offsprings (count creatures with [nb-food-taken >= 2])
   init-creatures nb-offsprings
   ask creatures [
@@ -137,6 +141,15 @@ to-report mutation [value]
   ifelse (random 100) < proba-mutation * 100
   [ report value ]
   [ report 0 ]
+end
+
+to reset-creatures
+    ask creatures [
+    set energy nb-init-energy
+    set nb-food-taken 0
+    face patch 0 0 ; face towards the center
+    set size creature-size
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -279,15 +292,15 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count creatures"
 
 SLIDER
-76
-422
-248
-455
+40
+415
+212
+448
 proba-mutation
 proba-mutation
 0.1
 1
-0.5
+0.3
 0.1
 1
 NIL
