@@ -130,9 +130,9 @@ to reproduce-creatures-with-mutation
     let mutate-sense-down (mutation -1)
 
     hatch 1 [
-      set creature-size (creature-size + mutate-size-up + mutate-size-down)
-      set speed (speed + mutate-speed-up + mutate-speed-down)
-      set sense (sense + mutate-sense-up + mutate-sense-down)
+      set creature-size (max list 0.1 (creature-size + mutate-size-up + mutate-size-down))
+      set speed (max list 0.1 (speed + mutate-speed-up + mutate-speed-down))
+      set sense (max list 0.1 (sense + mutate-sense-up + mutate-sense-down))
     ]
   ]
 end
