@@ -32,7 +32,7 @@ to init-creatures [nb]
   create-creatures nb
   [
     set shape "person"
-    set color green
+    set color white
     move-to one-of patches with ; simply said:
     [
       count neighbors < 8 and   ; place the creatures at the edge of the world
@@ -100,6 +100,7 @@ to next-generation
   clear-creatures-not-at-home
   reproduce-creatures-with-mutation
   reset-creatures
+  update-creatures-color
   init-patches
 end
 
@@ -149,6 +150,14 @@ to reset-creatures
     set nb-food-taken 0
     face patch 0 0 ; face towards the center
     set size creature-size
+  ]
+end
+
+to update-creatures-color
+  ask creatures [
+    if (max (list speed sense creature-size)) = speed [ set color blue]
+    if (max (list speed sense creature-size)) = sense [ set color red]
+    if (max (list speed sense creature-size)) = creature-size [ set color yellow]
   ]
 end
 @#$#@#$#@
@@ -267,7 +276,7 @@ nb-init-sense
 nb-init-sense
 1
 10
-5.0
+1.0
 1
 1
 NIL
