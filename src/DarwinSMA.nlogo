@@ -72,15 +72,48 @@ to move-creatures
 end
 
 to move-primitive
-  ; if we're near some food, go towards it
-  ifelse nb-food-taken < 2 and any? patches with [pcolor = green] in-radius sense
+  let d speed
+  ; find the different closest foods (green patch, creature smaller by 20+%) and threats (creature bigger by 20+%) in the sense radius
+  let closest-food min-one-of patches with [pcolor = green] in-radius sense [distance myself]
+  let closest-small-turtle min-one-of turtles with [size <= [size] of myself * 0.8] in-radius sense [distance myself]
+  let closest-big-turtle min-one-of turtles with [size >= [size] of myself * 1.2] in-radius sense [distance myself]
+
+  ; set the target based on the closest food if it has less than 2 food
+  let closest-target nobody
+  if closest-food != nobody and nb-food-taken < 2
   [
-    ; we select the nearest food and go towards it
-    face min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]
-    let d (distance (min-one-of (patches with [pcolor = green] in-radius sense) [distance myself]))
-    fd min list d speed
+    set closest-target closest-food
   ]
-  [ fd speed]
+  if closest-small-turtle != nobody and nb-food-taken < 2
+  [
+    if closest-target = nobody or [distance myself] of closest-small-turtle < [distance myself] of closest-target
+    [
+      set closest-target closest-small-turtle
+    ]
+  ]
+  ; if there is a threat, check if it is the closest
+  ifelse closest-big-turtle != nobody
+  [
+    if closest-target = nobody or [distance myself] of closest-big-turtle < [distance myself] of closest-target
+    [
+      ; Face away from the threat and move away
+      face closest-big-turtle
+      rt 180
+      fd speed
+    ]
+  ]
+  [
+    ifelse closest-target != nobody
+    [
+      face closest-target
+      set d min list d (distance closest-target)
+      fd d
+      if any? other turtles-here [eat-creature] ; we eat a smaller creature here so it can't get away
+    ]
+    [
+      fd speed
+    ]
+  ]
 
 end
 
@@ -92,6 +125,18 @@ to eat-grass
       count neighbors < 8 and
       not any? turtles-here
     ]) [distance myself]
+end
+
+to eat-creature
+  let smaller-creatures other turtles-here with [size < [size] of myself * 0.8]
+  if any? smaller-creatures
+  [
+    ask one-of smaller-creatures
+    [
+      die
+    ]
+    set nb-food-taken (nb-food-taken + 1)
+  ]
 end
 
 
@@ -182,8 +227,8 @@ GRAPHICS-WINDOW
 40
 -40
 40
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -661,7 +706,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
