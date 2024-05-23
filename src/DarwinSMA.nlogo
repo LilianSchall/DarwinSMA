@@ -72,7 +72,6 @@ to move-creatures
 end
 
 to move-primitive
-  let d speed
   ; find the different closest foods (green patch, creature smaller by 20+%) and threats (creature bigger by 20+%) in the sense radius
   let closest-food min-one-of patches with [pcolor = green] in-radius sense [distance myself]
   let closest-small-turtle min-one-of turtles with [size <= [size] of myself * 0.8] in-radius sense [distance myself]
@@ -99,15 +98,15 @@ to move-primitive
       ; Face away from the threat and move away
       face closest-big-turtle
       rt 180
-      fd speed
     ]
+    fd speed
   ]
   [
     ifelse closest-target != nobody
     [
       face closest-target
-      set d min list d (distance closest-target)
-      fd d
+      let d distance closest-target
+      fd min list d speed
       if any? other turtles-here [eat-creature] ; we eat a smaller creature here so it can't get away
     ]
     [
