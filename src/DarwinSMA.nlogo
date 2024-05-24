@@ -68,9 +68,6 @@ to move-creatures
     if pcolor = green and nb-food-taken < 2 [eat-grass] ; if we are on food, eat it
     move-primitive
     set energy (energy - (speed * speed * size * size * size + sense))
-  ]
-  ask creatures [
-    set label energy
     if (patch-ahead 1) = nobody [set energy 0]
   ]
 end
