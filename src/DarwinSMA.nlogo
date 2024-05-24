@@ -69,6 +69,10 @@ to move-creatures
     move-primitive
     set energy (energy - (speed * speed * size * size * size + sense))
   ]
+  ask creatures [
+    set label energy
+    if (patch-ahead 1) = nobody [set energy 0]
+  ]
 end
 
 to move-primitive
@@ -135,6 +139,11 @@ to eat-creature
       die
     ]
     set nb-food-taken (nb-food-taken + 1)
+    face min-one-of (patches with ; go to the nearest edge
+    [
+      count neighbors < 8 and
+      not any? turtles-here
+    ]) [distance myself]
   ]
 end
 
@@ -167,12 +176,12 @@ end
 
 to reproduce-creatures-with-mutation
   ask creatures with [nb-food-taken >= 2] [
-    let mutate-speed-up (mutation 0.5)
-    let mutate-speed-down (mutation -0.5)
-    let mutate-size-up (mutation 0.5)
-    let mutate-size-down (mutation -0.5)
-    let mutate-sense-up (mutation 1)
-    let mutate-sense-down (mutation -1)
+    let mutate-speed-up (mutation 0.1)
+    let mutate-speed-down (mutation -0.1)
+    let mutate-size-up (mutation 0.1)
+    let mutate-size-down (mutation -0.1)
+    let mutate-sense-up (mutation 0.1)
+    let mutate-sense-down (mutation -0.1)
 
     hatch 1 [
       set creature-size (max list 0.1 (creature-size + mutate-size-up + mutate-size-down))
@@ -304,7 +313,7 @@ SLIDER
 nb-init-energy
 nb-init-energy
 10
-500
+1000
 500.0
 10
 1
@@ -320,7 +329,7 @@ nb-init-sense
 nb-init-sense
 1
 10
-1.0
+5.0
 1
 1
 NIL
@@ -705,7 +714,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.4.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
