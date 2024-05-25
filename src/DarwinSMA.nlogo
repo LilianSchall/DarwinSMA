@@ -1,3 +1,26 @@
+globals
+[
+  ; variables used to show statistics
+  ; the mean of each represented genes
+  mean-speed
+  mean-creature-size
+  mean-sense
+
+  ; the number of individuals where the dominant gene is xx
+  nb-dominant-speed
+  nb-dominant-creature-size
+  nb-dominant-sense
+
+  ; the number of eaten individuals
+  nb-eaten-creatures-stat
+  nb-eaten-creatures
+
+  ; the number of eaten grass
+  nb-eaten-grass-stat
+  nb-eaten-grass
+]
+
+
 breed [creatures creature]
 
 creatures-own
@@ -57,9 +80,68 @@ to go
   ; whenever no creature can move, it's the end of the generation
   ; so let's launch the next generation
   if (count creatures with [energy > 0]) = 0 [
+    ; first we update stats for the generation
+    update-stats
+
     next-generation
   ]
+
+  if (count creatures) = 0 [
+    ; There are no creatures left at all
+    ; We can stop the simulation
+    stop
+  ]
+
   tick
+end
+
+to update-stats
+  ifelse any? creatures
+  [
+    ; Update the mean values of each genes
+    set mean-speed mean [speed] of creatures
+    set mean-creature-size mean [creature-size] of creatures
+    set mean-sense mean [sense] of creatures
+
+    ; Reset counters for dominant genes for the next generation
+    set nb-dominant-speed 0
+    set nb-dominant-creature-size 0
+    set nb-dominant-sense 0
+
+    ; Update the food eaten stats
+    set nb-eaten-creatures-stat nb-eaten-creatures
+    set nb-eaten-grass-stat nb-eaten-grass
+
+    ; Reset counters for food eaten for the next generation
+    set nb-eaten-creatures 0
+    set nb-eaten-grass 0
+
+    ; For each creature, determine the dominant trait and increment the respective counter
+    ask creatures [
+      let dominant-trait (max (list (speed - 1) (creature-size - 1) (sense - nb-init-sense)))
+      ifelse (dominant-trait = (speed - 1)) [
+        set nb-dominant-speed nb-dominant-speed + 1
+      ]
+      [
+        ifelse (dominant-trait = (creature-size - 1)) [
+          set nb-dominant-creature-size nb-dominant-creature-size + 1
+        ]
+        [
+          if (dominant-trait = (sense - nb-init-sense)) [
+            set nb-dominant-sense nb-dominant-sense + 1
+          ]
+        ]
+      ]
+    ]
+  ]
+  [
+    set mean-speed 0
+    set mean-creature-size 0
+    set mean-sense 0
+    set nb-dominant-speed 0
+    set nb-dominant-creature-size 0
+    set nb-dominant-sense 0
+  ]
 end
 
 to move-creatures
@@ -120,6 +202,7 @@ end
 to eat-grass
   set pcolor black
   set nb-food-taken (nb-food-taken + 1)
+  set nb-eaten-grass (nb-eaten-grass + 1) ; Increment the counter
   face min-one-of (patches with ; go to the nearest edge
     [
       count neighbors < 8 and
@@ -136,6 +219,7 @@ to eat-creature
       die
     ]
     set nb-food-taken (nb-food-taken + 1)
+    set nb-eaten-creatures (nb-eaten-creatures + 1) ; Increment the counter
     face min-one-of (patches with ; go to the nearest edge
     [
       count neighbors < 8 and
@@ -364,6 +448,65 @@ proba-mutation
 1
 NIL
 HORIZONTAL
+
+PLOT
+979
+10
+1392
+206
+Means of genes
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"speed" 1.0 0 -13345367 true "" "plot mean-speed"
+"sense" 1.0 0 -2674135 true "" "plot mean-sense"
+"size" 1.0 0 -1184463 true "" "plot mean-creature-size"
+
+PLOT
+973
+218
+1400
+424
+Dominant genes
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"speed" 1.0 0 -13345367 true "" "plot nb-dominant-speed"
+"sense" 1.0 0 -2674135 true "" "plot nb-dominant-sense"
+"size" 1.0 0 -1184463 true "" "plot nb-dominant-creature-size"
+
+PLOT
+974
+437
+1409
+623
+Food
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"cannibalism" 1.0 0 -2674135 true "" "plot nb-eaten-creatures-stat"
+"grass" 1.0 0 -10899396 true "" "plot nb-eaten-grass-stat"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -711,7 +854,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
