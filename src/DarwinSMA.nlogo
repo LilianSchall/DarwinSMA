@@ -119,16 +119,16 @@ to update-stats
     ; For each creature, determine the dominant trait and increment the respective counter
     ask creatures [
       let dominant-trait (max (list (speed - 1) (creature-size - 1) (sense - nb-init-sense)))
-      ifelse (dominant-trait = (speed - 1)) [
-        set nb-dominant-speed nb-dominant-speed + 1
+      ifelse (dominant-trait = (creature-size - 1)) [
+        set nb-dominant-creature-size nb-dominant-creature-size + 1
       ]
       [
-        ifelse (dominant-trait = (creature-size - 1)) [
-          set nb-dominant-creature-size nb-dominant-creature-size + 1
+        ifelse (dominant-trait = (sense - nb-init-sense)) [
+          set nb-dominant-sense nb-dominant-sense + 1
         ]
         [
-          if (dominant-trait = (sense - nb-init-sense)) [
-            set nb-dominant-sense nb-dominant-sense + 1
+          if (dominant-trait = (speed - 1)) [
+            set nb-dominant-speed nb-dominant-speed + 1
           ]
         ]
       ]
@@ -380,7 +380,7 @@ nb-food
 nb-food
 1
 100
-100.0
+48.0
 1
 1
 NIL
@@ -443,7 +443,7 @@ proba-mutation
 proba-mutation
 0.1
 1
-0.3
+0.4
 0.1
 1
 NIL
