@@ -149,7 +149,7 @@ to move-creatures
   [                               ; who still got energy left
     if pcolor = green and nb-food-taken < 2 [eat-grass] ; if we are on food, eat it
     move-primitive
-    set energy (energy - (speed * speed * size * size * size + sense))
+    set energy (energy - (speed * speed * creature-size * creature-size * creature-size + sense))
     if (patch-ahead 1) = nobody [set energy 0]
   ]
 end
@@ -257,25 +257,33 @@ end
 
 to reproduce-creatures-with-mutation
   ask creatures with [nb-food-taken >= 2] [
-    let mutate-speed-up (mutation 0.1)
-    let mutate-speed-down (mutation -0.1)
-    let mutate-size-up (mutation 0.1)
-    let mutate-size-down (mutation -0.1)
-    let mutate-sense-up (mutation 0.1)
-    let mutate-sense-down (mutation -0.1)
+    let mutate-speed (mutation 0.1)
+    let mutate-size (mutation 0.1)
+    let mutate-sense (mutation 0.1)
 
     hatch 1 [
-      set creature-size (max list 0.1 (creature-size + mutate-size-up + mutate-size-down))
-      set speed (max list 0.1 (speed + mutate-speed-up + mutate-speed-down))
-      set sense (max list 0.1 (sense + mutate-sense-up + mutate-sense-down))
+      set creature-size (max list 0.1 (creature-size + mutate-size))
+      set speed (max list 0.1 (speed + mutate-speed))
+      set sense (max list 0.1 (sense + mutate-sense))
     ]
   ]
 end
 
 to-report mutation [value]
-  ifelse (random 100) < proba-mutation * 100
-  [ report value ]
-  [ report 0 ]
+  let random-value  2 * (random 100) - 100
+  ifelse (random-value >= (-(proba-mutation) * 100) and random-value < 0)
+  [
+    report (-(value))
+  ]
+  [
+    ifelse (random-value >= 0 and random-value < proba-mutation * 100)
+    [
+      report value
+    ]
+    [
+      report 0
+    ]
+  ]
 end
 
 to reset-creatures
@@ -380,7 +388,7 @@ nb-food
 nb-food
 1
 100
-48.0
+100.0
 1
 1
 NIL
@@ -443,7 +451,7 @@ proba-mutation
 proba-mutation
 0.1
 1
-0.4
+1.0
 0.1
 1
 NIL
