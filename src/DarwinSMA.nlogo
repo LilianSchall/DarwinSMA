@@ -205,9 +205,9 @@ end
 
 to update-creatures-color
   ask creatures [
-    if (max (list speed sense creature-size)) = speed [ set color blue]
-    if (max (list speed sense creature-size)) = sense [ set color red]
-    if (max (list speed sense creature-size)) = creature-size [ set color yellow]
+    if (max (list (speed - 1) (sense - nb-init-sense) (creature-size - 1))) = (speed - 1) [ set color blue]
+    if (max (list (speed - 1) (sense - nb-init-sense) (creature-size - 1))) = (sense - nb-init-sense) [ set color red]
+    if (max (list (speed - 1) (sense - nb-init-sense) (creature-size - 1))) = (creature-size - 1) [ set color yellow]
   ]
 end
 @#$#@#$#@
